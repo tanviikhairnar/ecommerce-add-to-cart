@@ -80,7 +80,7 @@ function Cart({ cart, setCart, darkMode }) {
                 size="sm"
                 onClick={() => deleteItem(item.id)}
               >
-                🗑
+                <i class="bi bi-trash3"></i>
               </Button>
             </Col>
           </Row>
