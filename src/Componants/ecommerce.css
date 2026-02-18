@@ -71,6 +71,7 @@ section {
 
 button.btn-dark,
 button.btn-light {
+  border-radius: none;
   height: 44px;
   font-weight: 500;
   padding: 0 18px;
