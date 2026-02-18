@@ -84,7 +84,7 @@ function Ecommerce({ cart, setCart, darkMode, setDarkMode }) {
             </Button>
 
             <Button variant="dark" onClick={() => navigate("/cart")}>
-              🛒 ({cart.length})
+              <i class="bi bi-trash3"></i> ({cart.length})
             </Button>
           </div>
         </div>
