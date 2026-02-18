@@ -1,15 +1,8 @@
-import { useEffect, useState } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Spinner,
-  Button,
-  Form,
-} from "react-bootstrap";
+import { useEffect, useState, useMemo } from "react";
+import { Container, Row, Col, Card, Spinner, Button, Form, } from "react-bootstrap";
 import useLocalStorage from "../Hooks/useLocalStorage";
 import { useNavigate } from "react-router-dom";
+import "./ecommerce.css"
 
 const API_URL = "https://fakestoreapi.com/products";
 
@@ -17,6 +10,8 @@ function Ecommerce({ cart, setCart, darkMode, setDarkMode }) {
   const [products, setProducts] = useLocalStorage("ecommerce_products", []);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,6 +33,29 @@ function Ecommerce({ cart, setCart, darkMode, setDarkMode }) {
     fetchProducts();
   }, [products, setProducts]);
 
+  const handleSearch = (value) => {
+    setSearch(value);
+
+    if (!value.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    const matches = products
+      .filter((item) =>
+        item.title.toLowerCase().includes(value.toLowerCase())
+      )
+      .slice(0, 5);
+
+    setSuggestions(matches);
+  };
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((item) =>
+      item.title.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [products, search]);
+
   const addToCart = (product) => {
     const existing = cart.find((item) => item.id === product.id);
 
@@ -54,25 +72,37 @@ function Ecommerce({ cart, setCart, darkMode, setDarkMode }) {
     }
   };
 
-  const filteredProducts = products.filter((item) =>
-    item.title.toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
-    <section className={`py-5 ${darkMode ? "bg-dark" : "bg-light"}`}>
+    <section className={`py-5 ${darkMode ? "bg-dark text-light" : "bg-light"}`}>
       <Container>
-        <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-          <div>
-            <h2>Products</h2>
-          </div>
+        <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-4">
+          <h2 className="mb-0">Products</h2>
 
-          <Form.Control
-            type="text"
-            placeholder="Search product..."
-            style={{ maxWidth: "250px" }}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <div className="search-wrapper">
+            <Form.Control
+              type="text"
+              placeholder="Search product..."
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+
+            {suggestions.length > 0 && (
+              <div className="autocomplete-box">
+                {suggestions.map((item) => (
+                  <div
+                    key={item.id}
+                    className="autocomplete-item"
+                    onClick={() => {
+                      setSearch(item.title);
+                      setSuggestions([]);
+                    }}
+                  >
+                    {item.title}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           <div>
             <Button
@@ -84,7 +114,7 @@ function Ecommerce({ cart, setCart, darkMode, setDarkMode }) {
             </Button>
 
             <Button variant="dark" onClick={() => navigate("/cart")}>
-              <i class="bi bi-trash3"></i> ({cart.length})
+              <i className="bi bi-cart3"></i> ({cart.length})
             </Button>
           </div>
         </div>
@@ -119,14 +149,12 @@ function Ecommerce({ cart, setCart, darkMode, setDarkMode }) {
                   </Card.Title>
 
                   <Card.Text style={{ fontSize: "0.9rem" }}>
-                    {item.description.substring(0, 80)}...
+                    {item.description?.substring(0, 80)}...
                   </Card.Text>
 
                   <div className="d-flex justify-content-between mb-2">
                     <strong>${item.price}</strong>
-                    <small>
-                      ⭐ {item.rating?.rate}
-                    </small>
+                    <small>⭐ {item.rating?.rate ?? 0}</small>
                   </div>
 
                   <Button
@@ -147,4 +175,5 @@ function Ecommerce({ cart, setCart, darkMode, setDarkMode }) {
 }
 
 export default Ecommerce;
+
 

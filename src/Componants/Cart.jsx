@@ -31,8 +31,10 @@ function Cart({ cart, setCart, darkMode }) {
   );
 
   return (
-    <Container className="py-5">
+    <Container className={`py-5 ${darkMode ? "text-light" : ""}`}>
       <h2 className="mb-4">Your Cart</h2>
+
+      {cart.length === 0 && <p>Your cart is empty.</p>}
 
       {cart.map((item) => (
         <Card
@@ -45,6 +47,7 @@ function Cart({ cart, setCart, darkMode }) {
             <Col md={2}>
               <img
                 src={item.image}
+                alt={item.title}
                 style={{ width: "100px", objectFit: "contain" }}
               />
             </Col>
@@ -80,16 +83,18 @@ function Cart({ cart, setCart, darkMode }) {
                 size="sm"
                 onClick={() => deleteItem(item.id)}
               >
-                <i class="bi bi-trash3"></i>
+                <i className="bi bi-trash3"></i>
               </Button>
             </Col>
           </Row>
         </Card>
       ))}
 
-      <h4 className="text-end mt-4">
-        Total: ${total.toFixed(2)}
-      </h4>
+      {cart.length > 0 && (
+        <h4 className="text-end mt-4">
+          Total: ${total.toFixed(2)}
+        </h4>
+      )}
     </Container>
   );
 }
